@@ -192,8 +192,8 @@ def generar_los_chunks():
 # =========================
 # 5. Generar embedding
 # =========================
-def generar_embedding(texto):
-    return modelo_embeddings.encode(texto)
+def generar_embedding(chunks_y_pregunta):
+    return modelo_embeddings.encode(chunks_y_pregunta)
 
 # =========================
 # 6. Construir base semántica

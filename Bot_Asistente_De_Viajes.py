@@ -192,23 +192,23 @@ def generar_los_chunks():
 # =========================
 # 5. Generar embedding
 # =========================
-def generar_embedding(chunks_y_pregunta):
-    return modelo_embeddings.encode(chunks_y_pregunta)
+def generar_embedding(texto):
+    return modelo_embeddings.encode(texto)
 
 # =========================
 # 6. Construir base semántica
 # =========================
 def construir_base_semantica():
-    chunks = generar_los_chunks()
+    lista_chunks = generar_los_chunks()
     base_semantica = []
 
-    for item in chunks:
+    for informacion_chunk in lista_chunks:
         # Mostrar parte del chunk para seguimiento
-        embedding = generar_embedding(item["chunk"])
+        embedding = generar_embedding(informacion_chunk["chunk"])
 
         base_semantica.append({
-            "ciudad": item["ciudad"],
-            "chunk": item["chunk"],
+            "ciudad": informacion_chunk["ciudad"],
+            "chunk": informacion_chunk["chunk"],
             "embedding": embedding
         })
 
@@ -221,19 +221,19 @@ def buscar_chunks_relevantes(pregunta, base_semantica, top_k=5):
     embedding_pregunta = generar_embedding(pregunta)
     resultados = []
 
-    for item in base_semantica:
-        score = cosine_similarity(
+    for registro in base_semantica:
+        nivel_de_similitud = cosine_similarity(
             [embedding_pregunta],
-            [item["embedding"]]
+            [registro["embedding"]]
         )[0][0]
 
         resultados.append({
-            "ciudad": item["ciudad"],
-            "chunk": item["chunk"],
-            "score": score
+            "ciudad": registro["ciudad"],
+            "chunk": registro["chunk"],
+            "similitud": nivel_de_similitud
         })
 
-    resultados.sort(key=lambda x: x["score"], reverse=True)
+    resultados.sort(key=lambda x: x["similitud"], reverse=True)
     return resultados[:top_k]
 
 # =========================
@@ -241,8 +241,8 @@ def buscar_chunks_relevantes(pregunta, base_semantica, top_k=5):
 # =========================
 def construir_contexto(resultados):
     contexto = ""
-    for item in resultados:
-        contexto += f"- {item['chunk']}\n"
+    for resultado in resultados:
+        contexto += f"- {resultado['chunk']}\n"
     return contexto
 
 # =========================
